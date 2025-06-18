@@ -4,7 +4,7 @@ const pool = require('../db');
 const authMiddleware = require('../middleware/authMiddleware');
 
 
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   console.log('POST /products body:', req.body);
   const { name, price, description } = req.body;
   const user_id = parseInt(req.body.user_id, 10);
@@ -72,7 +72,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id',authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { name, price, description } = req.body;
   try {
@@ -87,7 +87,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id',authMiddleware, async (req, res) => {
   const { id } = req.params;
   try {
     const deleted = await pool.query('DELETE FROM products WHERE id = $1 RETURNING *', [id]);
@@ -98,34 +98,6 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-router.get('/count-by-user', async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT users.id, users.username, COUNT(products.id) AS product_count
-      FROM users
-      LEFT JOIN products ON users.id = products.user_id
-      GROUP BY users.id, users.username
-    `);
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-router.get('/user/:userId', async (req, res) => {
-  const { userId } = req.params;
-
-  try {
-    const result = await pool.query(
-      'SELECT * FROM products WHERE user_id = $1',
-      [userId]
-    );
-
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 module.exports = router;
 
 
