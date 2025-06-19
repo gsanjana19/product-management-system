@@ -24,6 +24,7 @@ services:
       DB_NAME: productdb
       DB_PASSWORD: Postsjn
       DB_PORT: 5432
+      JWT_SECRET: SuperStrongSecretKey123!@#
 
 volumes:
   pgdata:

@@ -24,7 +24,7 @@ router.get('/test-log', (req, res) => {
   res.send('Route works!');
 });
 
-router.get('/', async (req, res) => {
+router.get('/',authMiddleware, async (req, res) => {
   try {
     const allProducts = await pool.query('SELECT * FROM products');
     res.json(allProducts.rows);
@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/user/:userId', async (req, res) => {
+router.get('/user/:userId',authMiddleware, async (req, res) => {
   const { userId } = req.params;
   try {
     const result = await pool.query(
@@ -46,7 +46,7 @@ router.get('/user/:userId', async (req, res) => {
   }
 });
 
-router.get('/count-by-user', async (req, res) => {
+router.get('/count-by-user',authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT users.id, users.username, COUNT(products.id) AS product_count
@@ -61,7 +61,7 @@ router.get('/count-by-user', async (req, res) => {
 });
 
 
-router.get('/:id', async (req, res) => {
+router.get('/:id',authMiddleware, async (req, res) => {
   const { id } = req.params;
   try {
     const product = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
