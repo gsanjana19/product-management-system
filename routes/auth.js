@@ -5,22 +5,22 @@ const jwt = require('jsonwebtoken');
 const pool = require('../db');
 require('dotenv').config();
 
-// REGISTER
+
 router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
-    // Check if user exists
+    
     const userExists = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
     if (userExists.rows.length > 0) {
       return res.status(400).json({ error: 'User already exists' });
     }
 
-    // Hash password
+   
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Insert user
+  
     const newUser = await pool.query(
       'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *',
       [username, email, hashedPassword]
@@ -32,7 +32,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// LOGIN
+
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -56,7 +56,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Invalid credentials' });
     }
 
-    // Create token
+    
     const token = jwt.sign({ id: user.rows[0].id }, process.env.JWT_SECRET, {
       expiresIn: '1h',
     });
