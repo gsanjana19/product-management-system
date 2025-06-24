@@ -38,13 +38,6 @@ router.post('/login', async (req, res) => {
 
   try {
     const user = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
-    console.log("🚀 Login attempt:");
-    console.log("Username entered:", username);
-    console.log("User record from DB:", user.rows[0]);
-    console.log("Entered password:", password);
-    console.log("Hashed password in DB:", user.rows[0]?.password);
-    console.log("JWT_SECRET loaded:", process.env.JWT_SECRET);
-
     if (user.rows.length === 0) {
       return res.status(400).json({ error: 'Invalid credentials' });
     }
