@@ -2,9 +2,11 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 const authMiddleware = require('../middleware/authMiddleware');
+const authorizeRoles = require('../middleware/roleMiddleware');
 
 
-router.post('/', authMiddleware, async (req, res) => {
+
+router.post('/', authMiddleware, authorizeRoles('admin'), async (req, res) => {
   console.log('POST /products body:', req.body);
   const { name, price, description } = req.body;
   const user_id = parseInt(req.body.user_id, 10);
@@ -72,7 +74,7 @@ router.get('/:id',authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/:id',authMiddleware, async (req, res) => {
+router.put('/:id',authMiddleware, authorizeRoles('admin'), async (req, res) => {
   const { id } = req.params;
   const { name, price, description } = req.body;
   try {
@@ -87,7 +89,7 @@ router.put('/:id',authMiddleware, async (req, res) => {
   }
 });
 
-router.delete('/:id',authMiddleware, async (req, res) => {
+router.delete('/:id',authMiddleware,authorizeRoles('admin'), async (req, res) => {
   const { id } = req.params;
   try {
     const deleted = await pool.query('DELETE FROM products WHERE id = $1 RETURNING *', [id]);
@@ -99,6 +101,3 @@ router.delete('/:id',authMiddleware, async (req, res) => {
 });
 
 module.exports = router;
-
-
-

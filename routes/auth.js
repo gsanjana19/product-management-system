@@ -9,6 +9,10 @@ require('dotenv').config();
 router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
 
+   if (!username || !email || !password) {
+    return res.status(400).json({ error: 'All fields (username, email, password) are required.' });
+  }
+
   try {
     
     const userExists = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
@@ -49,12 +53,13 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Invalid credentials' });
     }
 
-    
-    const token = jwt.sign({ id: user.rows[0].id }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
-    });
+    const accessToken = jwt.sign(
+  { id: user.rows[0].id, role: user.rows[0].role },
+  process.env.JWT_SECRET,
+  { expiresIn: '1h' }
+  );
 
-    res.json({ token });
+    res.json({ token: accessToken });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
